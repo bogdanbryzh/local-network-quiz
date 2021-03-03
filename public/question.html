@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <link
+      rel="stylesheet"
+      href="https://pro.fontawesome.com/releases/v5.12.0/css/all.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css"
+      integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag=="
+      crossorigin="anonymous"
+    />
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      html {
+        /* width: 100vw; */
+        height: 100vh;
+      }
+      body {
+        --background: #ffffff;
+        --text: #3b3c3d;
+        --delete: #da1b1b;
+        --edit: #0f5c0f;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
+          sans-serif;
+        padding: 32px;
+        background: #f5f7fa;
+        position: relative;
+        height: 100%;
+      }
+      header.main {
+        padding: 0 7rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header button {
+        cursor: pointer;
+        border-radius: 1rem;
+        background: var(--text);
+        color: var(--background);
+        padding: 16px;
+        border: 2px solid var(--text);
+        box-shadow: 0 0 2rem -1rem rgba(0, 0, 0, 0.2);
+      }
+      .questions-container {
+        overflow-y: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+        grid-gap: 4rem;
+        margin-top: -3rem;
+        padding: 5rem;
+      }
+
+      .question-card {
+        position: relative;
+        height: min-content;
+        box-shadow: 0 0 2rem -1rem rgba(0, 0, 0, 0.05);
+      }
+      .question-card:hover {
+        box-shadow: 0 0 1.5rem -0.5rem rgba(0, 0, 0, 0.05);
+      }
+      .control-buttons {
+        z-index: 0;
+        position: absolute;
+        top: 1.25rem;
+        left: 1.25rem;
+        border-radius: 100%;
+        width: 0rem;
+        height: 0rem;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        transition: 0.25s cubic-bezier(0.25, 0, 0, 1);
+      }
+      .control-buttons button {
+        display: grid;
+        place-items: center;
+        position: absolute;
+        width: 2rem;
+        height: 2rem;
+        border: none;
+        border-radius: 100%;
+        background-color: var(--background);
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        transition: 0.25s cubic-bezier(0.25, 0, 0, 1);
+        box-shadow: 0 0 0rem -0.25rem var(--background);
+      }
+      .control-buttons button.fa-times {
+        color: var(--delete);
+      }
+      .control-buttons button.fa-times:hover {
+        background-color: var(--delete);
+        color: var(--background);
+        box-shadow: 0 0 1rem -0.25rem var(--delete);
+      }
+      .control-buttons button.fa-pencil {
+        color: var(--edit);
+      }
+      .control-buttons button.fa-pencil:hover {
+        background-color: var(--edit);
+        color: var(--background);
+        box-shadow: 0 0 1rem -0.25rem var(--edit);
+      }
+
+      .control-buttons button:first-child:nth-last-child(1):nth-child(1),
+      .control-buttons button:first-child:nth-last-child(1) ~ *:nth-child(1) {
+        left: 25%;
+        top: 25%;
+      }
+
+      .control-buttons button:first-child:nth-last-child(2):nth-child(1),
+      .control-buttons button:first-child:nth-last-child(2) ~ *:nth-child(1) {
+        left: 37.5%;
+        top: 18.75%;
+      }
+
+      .control-buttons button:first-child:nth-last-child(2):nth-child(2),
+      .control-buttons button:first-child:nth-last-child(2) ~ *:nth-child(2) {
+        left: 18.75%;
+        top: 37.5%;
+      }
+
+      .control-buttons button:first-child:nth-last-child(3):nth-child(1),
+      .control-buttons button:first-child:nth-last-child(3) ~ *:nth-child(1) {
+        left: 50%;
+        top: 15.625%;
+      }
+
+      .control-buttons button:first-child:nth-last-child(3):nth-child(2),
+      .control-buttons button:first-child:nth-last-child(3) ~ *:nth-child(2) {
+        left: 25%;
+        top: 25%;
+      }
+
+      .control-buttons button:first-child:nth-last-child(3):nth-child(3),
+      .control-buttons button:first-child:nth-last-child(3) ~ *:nth-child(3) {
+        left: 15.625%;
+        top: 50%;
+      }
+
+      .control-buttons button:first-child:nth-last-child(4):nth-child(1),
+      .control-buttons button:first-child:nth-last-child(4) ~ *:nth-child(1) {
+        left: 62.5%;
+        top: 18.75%;
+      }
+
+      .control-buttons button:first-child:nth-last-child(4):nth-child(2),
+      .control-buttons button:first-child:nth-last-child(4) ~ *:nth-child(2) {
+        left: 37.5%;
+        top: 18.75%;
+      }
+
+      .control-buttons button:first-child:nth-last-child(4):nth-child(3),
+      .control-buttons button:first-child:nth-last-child(4) ~ *:nth-child(3) {
+        left: 18.75%;
+        top: 37.5%;
+      }
+
+      .control-buttons button:first-child:nth-last-child(4):nth-child(4),
+      .control-buttons button:first-child:nth-last-child(4) ~ *:nth-child(4) {
+        left: 18.75%;
+        top: 62.5%;
+      }
+      .question-container {
+        width: 100%;
+        height: 100%;
+        border-radius: 1rem;
+        background-color: var(--background);
+        color: var(--text);
+        padding: 16px;
+      }
+      .question-card:hover .control-buttons,
+      .question-card .control-buttons:focus-within {
+        width: 10rem;
+        height: 10rem;
+        opacity: 1;
+      }
+
+      .questions-container h3 {
+        padding-top: 16px;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .answers-container {
+        padding: 8px;
+      }
+      .answers-container p {
+        padding: 8px;
+      }
+
+      [data-is-answer='true'] {
+        font-weight: 600;
+      }
+
+      /* .modal {
+        font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+          helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial,
+          sans-serif;
+      } */
+
+      .modal__overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal__container {
+        background-color: #fff;
+        padding: 30px;
+        max-width: 700px;
+        min-width: 600px;
+        max-height: 100vh;
+        border-radius: 1rem;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+
+      .modal__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal__title {
+        margin-top: 0;
+        margin-bottom: 0;
+        font-weight: 600;
+        font-size: 1.25rem;
+        line-height: 1.25;
+        color: #00449e;
+        box-sizing: border-box;
+      }
+
+      .modal__close {
+        background: transparent;
+        border: 0;
+      }
+
+      .modal__content {
+        margin-top: 2rem;
+        line-height: 1.5;
+        color: rgba(0, 0, 0, 0.8);
+      }
+
+      .modal__footer {
+        margin-top: 2rem;
+      }
+
+      .modal__btn {
+        font-size: 0.875rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        background-color: #e6e6e6;
+        color: rgba(0, 0, 0, 0.8);
+        border-radius: 0.25rem;
+        border-style: none;
+        border-width: 0;
+        cursor: pointer;
+        /* -webkit-appearance: button; */
+        text-transform: none;
+        overflow: visible;
+        line-height: 1.15;
+        margin: 0;
+        will-change: transform;
+        /* -moz-osx-font-smoothing: grayscale; */
+        /* -webkit-backface-visibility: hidden; */
+        backface-visibility: hidden;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        transition: -webkit-transform 0.25s ease-out;
+        transition: transform 0.25s ease-out;
+        transition: transform 0.25s ease-out, -webkit-transform 0.25s ease-out;
+      }
+
+      .modal__btn:focus,
+      .modal__btn:hover {
+        -webkit-transform: scale(1.05);
+        transform: scale(1.05);
+      }
+
+      .modal__btn-primary {
+        background-color: #00449e;
+        color: #fff;
+      }
+
+      /**************************\
+  Demo Animation Style
+\**************************/
+      @keyframes mmfadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes mmfadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      @keyframes mmslideIn {
+        from {
+          transform: translateY(15%);
+        }
+        to {
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes mmslideOut {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(-10%);
+        }
+      }
+
+      .micromodal-slide {
+        display: none;
+      }
+
+      .micromodal-slide.is-open {
+        display: block;
+      }
+
+      .micromodal-slide[aria-hidden='false'] .modal__overlay {
+        animation: mmfadeIn 0.3s cubic-bezier(0, 0, 0.2, 1);
+      }
+
+      .micromodal-slide[aria-hidden='false'] .modal__container {
+        animation: mmslideIn 0.3s cubic-bezier(0, 0, 0.2, 1);
+      }
+
+      .micromodal-slide[aria-hidden='true'] .modal__overlay {
+        animation: mmfadeOut 0.3s cubic-bezier(0, 0, 0.2, 1);
+      }
+
+      .micromodal-slide[aria-hidden='true'] .modal__container {
+        animation: mmslideOut 0.3s cubic-bezier(0, 0, 0.2, 1);
+      }
+
+      .micromodal-slide .modal__container,
+      .micromodal-slide .modal__overlay {
+        will-change: transform;
+      }
+
+      [data-modal-radio] {
+        cursor: pointer;
+      }
+
+      form input {
+        width: 100%;
+        padding: 8px;
+        margin: 8px 0;
+        border: none;
+        outline: none;
+        border-bottom: 1px solid #3b3c3d;
+      }
+
+      form input:focus,
+      form input:focus-within {
+        border-bottom: 1px solid #00449e;
+      }
+
+      form div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      form div input {
+        font-size: 0.9rem;
+        width: 90%;
+      }
+
+      form div span {
+        margin-right: 8px;
+        margin-left: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="modal micromodal-slide" id="modal-edit" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div
+          class="modal__container"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-edit-title"
+        >
+          <header class="modal__header">
+            <h2 class="modal__title" id="modal-edit-title">Edit quetion</h2>
+            <button
+              class="modal__close fas fa-times"
+              style="color: #3b3c3d"
+              aria-label="Close modal"
+              data-micromodal-close
+            ></button>
+          </header>
+          <main class="modal__content" id="modal-edit-content">
+            <form id="editor" data-action="new">
+              <input
+                type="text"
+                placeholder="Question"
+                required
+                data-modal="question"
+              />
+              <div>
+                <input
+                  type="text"
+                  data-modal="answer"
+                  placeholder="Answer"
+                  required
+                />
+                <span
+                  class="fa-stack fa-lg"
+                  style="font-size: 14px"
+                  data-modal-is-answer="false"
+                >
+                  <i class="fas fa-square fa-stack-2x fa-inverse"></i>
+                  <i class="fas fa-check fa-stack-1x"></i>
+                </span>
+              </div>
+              <div>
+                <input
+                  type="text"
+                  data-modal="answer"
+                  placeholder="Answer"
+                  required
+                />
+                <span
+                  class="fa-stack fa-lg"
+                  style="font-size: 14px"
+                  data-modal-is-answer="false"
+                >
+                  <i class="fas fa-square fa-stack-2x fa-inverse"></i>
+                  <i class="fas fa-check fa-stack-1x"></i>
+                </span>
+              </div>
+              <div>
+                <input
+                  type="text"
+                  data-modal="answer"
+                  placeholder="Answer"
+                  required
+                />
+                <span
+                  class="fa-stack fa-lg"
+                  style="font-size: 14px"
+                  data-modal-is-answer="false"
+                >
+                  <i class="fas fa-square fa-stack-2x fa-inverse"></i>
+                  <i class="fas fa-check fa-stack-1x"></i>
+                </span>
+              </div>
+              <div>
+                <input
+                  type="text"
+                  data-modal="answer"
+                  placeholder="Answer"
+                  required
+                />
+                <span
+                  class="fa-stack fa-lg"
+                  style="font-size: 14px"
+                  data-modal-is-answer="false"
+                >
+                  <i class="fas fa-square fa-stack-2x fa-inverse"></i>
+                  <i class="fas fa-check fa-stack-1x"></i>
+                </span>
+              </div>
+              <div class="modal__footer">
+                <button type="submit" class="modal__btn modal__btn-primary">
+                  Save
+                </button>
+                <span
+                  class="modal__btn"
+                  data-micromodal-close
+                  aria-label="Close this dialog window"
+                >
+                  Close
+                </span>
+              </div>
+            </form>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <header class="main">
+      <h1>Questions editor</h1>
+      <button data-micromodal-trigger="modal-edit" id="new">New</button>
+    </header>
+    <div class="questions-container"></div>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"
+      integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/micromodal@0.4.6/dist/micromodal.min.js"
+      integrity="sha256-6w77yaba3tgI3Kp+Xl0/Yd3lfhfAVOaspp0fNB3cT18="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      iziToast.settings({
+        timeout: 10000,
+        transitionIn: 'flipInX',
+        transitionOut: 'flipOutX',
+      });
+      const showSuccess = () => {
+        iziToast.success({
+          title: 'OK',
+          message: 'Successfully deleted question!',
+          timeout: 2000,
+        });
+      };
+
+      const destroyQuestionCard = questionID => {
+        document.querySelector(`[data-question-id="${questionID}"]`).remove();
+      };
+
+      const askToDelete = questionID => {
+        iziToast.question({
+          timeout: 20000,
+          close: false,
+          overlay: true,
+          displayMode: 'once',
+          id: 'question',
+          zindex: 999,
+          title: 'Hey',
+          message: 'Are you sure about that?',
+          position: 'center',
+          buttons: [
+            [
+              '<button><b>YES</b></button>',
+              (instance, toast) => {
+                fetch(`/questions/${questionID}`, {
+                  method: 'DELETE',
+                })
+                  .then(response => response.json())
+                  .then(data => {
+                    destroyQuestionCard(questionID);
+                    showSuccess();
+                  })
+                  .catch(err => console.err(err));
+                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+              },
+              true,
+            ],
+            [
+              '<button>NO</button>',
+              (instance, toast) => {
+                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+              },
+            ],
+          ],
+        });
+      };
+
+      const questionsContainer = document.getElementsByClassName(
+        'questions-container'
+      )[0];
+
+      const applyRadio = () => {
+        console.log('its called');
+        const dataModalRadio = Array.from(
+          document.querySelectorAll('[data-modal-is-answer]')
+        );
+        const dataModalRadioSquare = Array.from(
+          document.querySelectorAll('[data-modal-is-answer] .fa-square')
+        );
+        const dataModalRadioCheck = Array.from(
+          document.querySelectorAll('[data-modal-is-answer] .fa-check')
+        );
+
+        dataModalRadio.forEach(modalRadio => {
+          modalRadio.addEventListener('click', e => {
+            dataModalRadioCheck.forEach((check, index) => {
+              check.classList.remove('fa-inverse');
+              dataModalRadioSquare[index].classList.add('fa-inverse');
+            });
+            dataModalRadio.forEach(radio => {
+              radio.dataset.modalIsAnswer = false;
+            });
+
+            e.target.parentNode.dataset.modalIsAnswer = true;
+            e.target.parentNode.children[1].classList.add('fa-inverse');
+            e.target.parentNode.children[0].classList.remove('fa-inverse');
+          });
+        });
+      };
+
+      const renderAnswers = answers => {
+        const answersDiv = document.createElement('div');
+        answersDiv.classList.add('answers-container');
+
+        answers.forEach(answer => {
+          const answerP = document.createElement('p');
+          answerP.dataset.modalAnswerId = answer._id;
+          answerP.dataset.isAnswer = answer.isAnswer;
+          answerP.textContent = answer.text;
+
+          answersDiv.appendChild(answerP);
+        });
+
+        return answersDiv;
+      };
+
+      const renderQuestion = question => {
+        const questionCard = document.createElement('div');
+        questionCard.classList.add('question-card');
+
+        const controlButtons = document.createElement('div');
+        controlButtons.classList.add('control-buttons');
+
+        const editBtn = document.createElement('button');
+        editBtn.classList.add('fas');
+        editBtn.classList.add('fa-pencil');
+
+        editBtn.dataset.micromodalTrigger = 'modal-edit';
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add('fas');
+        deleteBtn.classList.add('fa-times');
+
+        deleteBtn.addEventListener('click', () => {
+          askToDelete(question._id);
+        });
+
+        controlButtons.appendChild(deleteBtn);
+        controlButtons.appendChild(editBtn);
+
+        const questionContainer = document.createElement('div');
+        questionContainer.classList.add('question-container');
+        questionCard.dataset.questionId = question._id;
+
+        const questionH3 = document.createElement('h3');
+        questionH3.textContent = question.question;
+
+        questionContainer.appendChild(questionH3);
+        questionContainer.appendChild(renderAnswers(question.answers));
+        questionCard.appendChild(controlButtons);
+        questionCard.appendChild(questionContainer);
+        questionsContainer.appendChild(questionCard);
+
+        const questionModal = document.querySelector('[data-modal="question"]');
+        const answersModal = Array.from(
+          document.querySelectorAll('[data-modal="answer"]')
+        );
+        const boolAnswer = Array.from(
+          document.querySelectorAll('[data-modal-is-answer]')
+        );
+
+        editBtn.addEventListener('click', e => {
+          document.getElementById('modal-edit-title').textContent =
+            'Edit question';
+          const questionCard = e.target.parentNode.parentNode;
+
+          document.getElementById('editor').dataset.action = 'edit';
+          questionModal.value = questionCard.children[1].querySelector(
+            'h3'
+          ).textContent;
+          questionModal.dataset.id = questionCard.dataset.questionId;
+          question.answers.forEach((answer, index) => {
+            answersModal[index].value = answer.text;
+            answersModal[index].dataset.modalAnswerId = answer._id;
+            boolAnswer[index].dataset.modalIsAnswer = answer.isAnswer;
+          });
+
+          Array.from(
+            document.querySelectorAll('[data-modal-is-answer] .fa-check')
+          ).forEach((check, index) => {
+            check.classList.remove('fa-inverse');
+            Array.from(
+              document.querySelectorAll('[data-modal-is-answer] .fa-square')
+            )[index].classList.add('fa-inverse');
+          });
+          document
+            .querySelector('[data-modal-is-answer="true"] .fa-check')
+            .classList.add('fa-inverse');
+          document
+            .querySelector('[data-modal-is-answer="true"]  .fa-square')
+            .classList.remove('fa-inverse');
+          MicroModal.show('modal-edit');
+        });
+      };
+
+      const getQuestions = async () => {
+        let response = await fetch('/questions');
+        let questions = response.json();
+        return questions;
+      };
+
+      getQuestions().then(questions => {
+        questions.forEach(question => {
+          renderQuestion(question);
+        });
+      });
+
+      applyRadio();
+      MicroModal.init({
+        openClass: 'is-open', // [5]
+        disableScroll: true, // [6]
+        disableFocus: false, // [7]
+        awaitOpenAnimation: true, // [8]
+        awaitCloseAnimation: true, // [9]
+        debugMode: true, // [10]
+      });
+      document.getElementById('new').addEventListener('click', () => {
+        console.log('btn');
+        document.getElementById('editor').dataset.action = 'new';
+        document.getElementById('modal-edit-title').textContent =
+          'New question';
+        document.querySelector('[data-modal="question"').value = '';
+
+        Array.from(document.querySelectorAll('[data-modal="answer"]')).forEach(
+          answer => {
+            answer.dataset.modalAnswerId = '';
+            answer.value = '';
+          }
+        );
+
+        Array.from(document.querySelectorAll('[data-modal-is-answer]')).forEach(
+          isAnswr => {
+            isAnswr.dataset.modalIsAnswer = false;
+          }
+        );
+
+        Array.from(
+          document.querySelectorAll('[data-modal-is-answer] .fa-check')
+        ).forEach((check, index) => {
+          check.classList.remove('fa-inverse');
+          Array.from(
+            document.querySelectorAll('[data-modal-is-answer] .fa-square')
+          )[index].classList.add('fa-inverse');
+        });
+
+        MicroModal.show('modal-edit');
+      });
+
+      const form = document.getElementById('editor');
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const questionInput = document.querySelector('[data-modal="question"]');
+        const question = questionInput.value;
+
+        const answersInputs = Array.from(
+          document.querySelectorAll('[data-modal="answer"]')
+        );
+        const answersIsAnswers = Array.from(
+          document.querySelectorAll('[data-modal-is-answer]')
+        );
+
+        const trueOrFalse = [];
+        [...answersIsAnswers].forEach(answr => {
+          trueOrFalse.push(answr.dataset.modalIsAnswer);
+        });
+        if (trueOrFalse.includes('true')) {
+          if (form.dataset.action === 'new') {
+            const answers = [];
+
+            answersInputs.forEach((answr, index) => {
+              const answer = {
+                text: answr.value,
+                isAnswer: answersIsAnswers[index].dataset.modalIsAnswer,
+              };
+              answers.push(answer);
+            });
+
+            const dataToSend = {
+              question,
+              answers,
+            };
+
+            fetch('/questions', {
+              method: 'POST',
+              mode: 'cors',
+              cache: 'no-cache',
+              credentials: 'same-origin',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(dataToSend),
+            })
+              .then(response => response.json())
+              .then(data => {
+                iziToast.success({
+                  timeout: 1000,
+                  title: 'Yay',
+                  message: 'Question recorded',
+                });
+                renderQuestion(data);
+                MicroModal.close('modal-edit');
+              })
+              .catch(err => console.err(err));
+          }
+          if (form.dataset.action === 'edit') {
+            const questionID = questionInput.dataset.id;
+            const answers = [];
+
+            answersInputs.forEach((answr, index) => {
+              const answer = {
+                text: answr.value,
+                isAnswer: answersIsAnswers[index].dataset.modalIsAnswer,
+              };
+              answers.push(answer);
+            });
+
+            const dataToSend = {
+              question,
+              answers,
+            };
+
+            fetch(`/questions/${questionID}`, {
+              method: 'PATCH',
+              mode: 'cors',
+              cache: 'no-cache',
+              completed: true,
+              credentials: 'same-origin',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(dataToSend),
+            })
+              .then(response => response.json())
+              .then(data => {
+                iziToast.success({
+                  timeout: 1000,
+                  title: 'Yay',
+                  message: 'Question edited',
+                });
+                destroyQuestionCard(questionID);
+                renderQuestion(dataToSend);
+                MicroModal.close('modal-edit');
+              })
+              .catch(err => console.err(err));
+          }
+        } else {
+          iziToast.warning({
+            title: 'Caution',
+            message: "You didn't choose an answer",
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

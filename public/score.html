@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      body {
+        color: #3b3c3d;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      h1 {
+        background-color: #333;
+        color: #fafafa;
+        padding: 5rem;
+      }
+      h3 {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 3rem;
+      }
+      h3:nth-child(2n) {
+        background-color: #fafafa;
+      }
+      h3:nth-child(1) {
+        background-color: #ffd700;
+      }
+      h3:nth-child(2) {
+        background-color: #c0c0c0;
+      }
+      h3:nth-child(3) {
+        background-color: #cd7f32;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Score board</h1>
+    <div id="winners"></div>
+    <script>
+      const winnersContainer = document.getElementById('winners');
+
+      const renderWinners = winners => {
+        winnersContainer.innerHTML = '';
+        winners.forEach(winner => {
+          winnersContainer.innerHTML += `<h3>${winner.username}
+          <span>${winner.score}</span></h3>`;
+        });
+      };
+
+      const timer = setInterval(() => {
+        fetch('/results')
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            renderWinners(data);
+          });
+      }, 2000);
+
+      fetch('/results')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          renderWinners(data);
+        });
+    </script>
+  </body>
+</html>
