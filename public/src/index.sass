@@ -39,6 +39,7 @@ body
       display: flex
       justify-content: center
       flex-direction: column
+      margin-top: -($base * 10)
 
 h1
   margin-bottom: $base * 3
@@ -66,9 +67,13 @@ form
         color: $secondary_color
 
     &[type="submit"]
+      padding: $base * 2
+      margin: $base
+      border: $base / 4 solid $green
       background-color: $green
       color: $white
       text-transform: uppercase
+      font-weight: bold
 
       &:active,
       &:hover
@@ -109,3 +114,22 @@ form
   position: fixed
   top: 50px
   right: 50px
+
+.logo
+  font-size: $base * 3
+  text-transform: uppercase
+  font-weight: bold
+  position: fixed
+  bottom: 0
+  left: 0
+  right: 0
+  padding: $base * 2
+  color: $primary_color
+  text-shadow: 1px 1px 0 $primary_color
+  display: flex
+  align-items: center
+  justify-content: center
+  background-color: $black
+
+  p
+    padding-left: 16px

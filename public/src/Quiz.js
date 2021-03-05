@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Cookies from 'universal-cookie';
 import axios from 'axios';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBible } from '@fortawesome/free-solid-svg-icons';
+
 const cookies = new Cookies();
 
 const shuffleArray = array => {
@@ -128,22 +131,23 @@ const Quiz = () => {
 
   // Dev
 
-  const clearCookies = () => {
+  const cleanUp = e => {
+    e.preventDefault();
     const allCookies = cookies.getAll();
     for (const cookie in allCookies) {
       cookies.remove(cookie);
     }
-  };
-
-  const clearStorage = () => {
     quizStorage.clear();
   };
 
   return (
     <>
-      <div className='dev'>
-        <button onClick={clearCookies}>Clear cookies</button>
-        <button onClick={clearStorage}>Clear storage</button>
+      {/* <div className='dev'>
+        <button onClick={cleanUp}>log out</button>
+      </div> */}
+      <div className='logo' onContextMenu={cleanUp}>
+        <FontAwesomeIcon icon={faBible} size='lg' />
+        <p>Біблійна сотня</p>
       </div>
       {logged ? (
         <>
@@ -151,18 +155,25 @@ const Quiz = () => {
             <>
               <div className='center-vert'>
                 {score / questions.length < 0.33 ? (
-                  <h1>Well...</h1>
+                  <>
+                    <h1>Що ж... Наступного разу пощастить{')'}</h1>
+                    <p>
+                      Набрано {score} балів зі {questions.length}.
+                    </p>
+                  </>
                 ) : (
-                  <h1>Nice game!</h1>
+                  <>
+                    <h1>Чудовий раунд!</h1>
+                    <p>
+                      Набрано {score} балів зі {questions.length}!
+                    </p>
+                  </>
                 )}
-                <p>
-                  You got {score} points out of {questions.length} questions!
-                </p>
               </div>
             </>
           ) : (
             <>
-              <h1>Hello, {username}!</h1>
+              <h1>Привіт, {username}!</h1>
               <section className='questions'>
                 {isQuestionsLoaded ? (
                   (console.log(questions.length),
@@ -189,12 +200,12 @@ const Quiz = () => {
                     </>
                   ) : (
                     <>
-                      <h1>Nothing here</h1>
+                      <h1>Доволі пусто, хммм</h1>
                     </>
                   ))
                 ) : (
                   <>
-                    <p>Loading...</p>
+                    <p>Завантаження...</p>
                   </>
                 )}
               </section>
@@ -204,14 +215,14 @@ const Quiz = () => {
       ) : (
         <>
           <div className='center-vert'>
-            <h1>Welcome!</h1>
+            <h1>Вітаємо!</h1>
             <form onSubmit={handleLogin}>
               <input
                 type='text'
-                placeholder='Your name'
+                placeholder='Твоє ймення'
                 onInput={handleInput}
               />
-              <input type='submit' value='Go ahead!' />
+              <input type='submit' value='Поїхали!' />
             </form>
           </div>
         </>
