@@ -25,6 +25,7 @@ const Quiz = () => {
   // User info
   const [username, setUsername] = useState(cookies.get('username') || '');
   const [score, setScore] = useState(parseInt(cookies.get('userScore')) || 0);
+  const [resultID, setResultID] = useState(cookies.get('resultID') || null);
 
   // Questions
   const [presentInCache, setPresentInCache] = useState(true);
@@ -58,9 +59,32 @@ const Quiz = () => {
 
   useEffect(() => {
     cookies.set('current-question', currentQuestion);
+    setTimeout(() => {
+      console.log(currentQuestion);
+      setCurrentQuestion(currentQuestion + 1);
+    }, 40000);
   }, [currentQuestion]);
 
   useEffect(() => {
+    if (username && score > 0) {
+      if (resultID) {
+        axios.put(`/results/${resultID}`, {
+          username,
+          score,
+        });
+      } else {
+        axios
+          .post('/results', {
+            username,
+            score,
+          })
+          .then(response => {
+            setResultID(response.data._id);
+            cookies.set('resultID', response.data._id);
+          })
+          .catch(err => console.log(err));
+      }
+    }
     cookies.set('userScore', score);
   }, [score]);
 
@@ -86,12 +110,12 @@ const Quiz = () => {
     if (isAlreadyFinished) {
       if (!cookies.get('submitted')) {
         cookies.set('submitted', true);
-        console.log('finishing....');
-        console.log(score);
-        axios.post('/results/submit', {
-          username,
-          score,
-        });
+        axios
+          .put(`/results/${resultID}`, {
+            username,
+            score,
+          })
+          .catch(err => console.log(err));
       }
     }
   }, [isAlreadyFinished, username, score]);
@@ -131,21 +155,21 @@ const Quiz = () => {
 
   // Dev
 
-  const cleanUp = e => {
-    e.preventDefault();
-    const allCookies = cookies.getAll();
-    for (const cookie in allCookies) {
-      cookies.remove(cookie);
-    }
-    quizStorage.clear();
-  };
+  // const cleanUp = e => {
+  //   e.preventDefault();
+  //   const allCookies = cookies.getAll();
+  //   for (const cookie in allCookies) {
+  //     cookies.remove(cookie);
+  //   }
+  //   quizStorage.clear();
+  // };
 
   return (
     <>
       {/* <div className='dev'>
         <button onClick={cleanUp}>log out</button>
       </div> */}
-      <div className='logo' onContextMenu={cleanUp}>
+      <div className='logo'>
         <FontAwesomeIcon icon={faBible} size='lg' />
         <p>Біблійна сотня</p>
       </div>
@@ -173,10 +197,12 @@ const Quiz = () => {
             </>
           ) : (
             <>
+              <div className='progress-bar'>
+                <div className="loader"></div>
+              </div>
               <h1>Привіт, {username}!</h1>
               <section className='questions'>
                 {isQuestionsLoaded ? (
-                  (console.log(questions.length),
                   questions.length > 0 ? (
                     <>
                       <p className='count'>
@@ -202,7 +228,7 @@ const Quiz = () => {
                     <>
                       <h1>Доволі пусто, хммм</h1>
                     </>
-                  ))
+                  )
                 ) : (
                   <>
                     <p>Завантаження...</p>
