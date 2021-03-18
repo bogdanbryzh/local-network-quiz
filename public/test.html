@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test</title>
+    <style>
+      body {
+        overflow-y: hidden;
+      }
+      #sender {
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test</h1>
+    <p><span id="count">0</span> requests sent</p>
+    <output id="sender"></output>
+    <input type="text">
+    <script>
+      const now = Date.now();
+      const sendRequest = () => {
+        fetch('/test', {
+          method: 'POST',
+          body: JSON.stringify({ message: '[ OK? ]' }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            const requests = document.getElementById('count');
+            requests.textContent = parseInt(requests.textContent) + 1;
+            document.getElementById(
+              'sender'
+            ).innerHTML = `<p>${requests.textContent} request ${data.message}</p>`;
+            const time = Date.now() - now;
+            if (time <= 10000) {
+              sendRequest();
+            } else {
+              fetch('/test?final=true', {
+                method: 'POST',
+                mode: 'cors',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  rps: parseInt(requests.textContent) / 10,
+                }),
+              });
+            }
+          })
+          .catch(err => console.log(err));
+      };
+
+      console.log(sendRequest());
+      // const sender = setInterval(() => {
+      //   fetch('/test', {
+      //     method: 'POST',
+      //     body: JSON.stringify({ message: '[ OK? ]' }),
+      //   })
+      //     .then(response => response.json())
+      //     .then(data => {
+      //       const requests = document.getElementById('count');
+      //       requests.textContent = parseInt(requests.textContent) + 1;
+      //       document.getElementById(
+      //         'sender'
+      //       ).innerHTML = `<p>${requests.textContent} request ${data.message}</p>`;
+      //     })
+      //     .catch(err => console.log(err));
+      // }, 200);
+      // const timer = setTimeout(() => {
+      //   clearInterval(sender);
+      //   const requests =
+      //     parseInt(document.getElementById('count').textContent) + 1;
+      //   const tpr = 20000 / requests;
+      //   const body = {
+      //     tpr,
+      //   };
+      //   console.log(body);
+      //   fetch('/test?final=true', {
+      //     method: 'POST',
+      //     mode: 'cors',
+      //     cache: 'no-cache',
+      //     credentials: 'same-origin',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify(body),
+      //   });
+      // }, 20000);
+    </script>
+  </body>
+</html>

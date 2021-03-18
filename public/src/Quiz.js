@@ -21,9 +21,10 @@ const Quiz = () => {
   // Defining app states
   const [logged, setLogged] = useState(false);
   const [isAlreadyFinished, setIsAlreadyFinished] = useState(false);
+  const [usernameGot, setUsernameGot] = useState(false);
 
   // User info
-  const [username, setUsername] = useState(cookies.get('username') || '');
+  const [username, setUsername] = useState('');
   const [score, setScore] = useState(parseInt(cookies.get('userScore')) || 0);
   const [resultID, setResultID] = useState(cookies.get('resultID') || null);
 
@@ -37,7 +38,19 @@ const Quiz = () => {
     parseInt(cookies.get('current-question')) || 0
   );
 
+  const [logs, setLogs] = useState('');
+  const [loader, setLoader] = useState('loader');
+
   // get user states
+  useEffect(() => {
+    setUsername(quizStorage.getItem('username') || '');
+
+    console.log(username);
+    if (username) {
+      setLogged(true);
+    }
+  }, [username]);
+
   useEffect(() => {
     setLogged(cookies.get('userLogged') || false);
   }, []);
@@ -59,15 +72,33 @@ const Quiz = () => {
 
   useEffect(() => {
     cookies.set('current-question', currentQuestion);
-    setTimeout(() => {
-      console.log(currentQuestion);
-      setCurrentQuestion(currentQuestion + 1);
+
+    clearTimeout(window.nextQ);
+    window.nextQ = setTimeout(() => {
+      console.log('currr', currentQuestion);
+      if (currentQuestion !== 0) {
+        console.log('currrr', currentQuestion, typeof currentQuestion);
+        if (currentQuestion === 99) {
+          setIsAlreadyFinished(true);
+        } else {
+          setCurrentQuestion(currentQuestion + 1);
+        }
+      }
     }, 40000);
+  }, [currentQuestion]);
+
+  useEffect(() => {
+    setLoader('empty');
+
+    setTimeout(() => {
+      setLoader('loader');
+    }, 10);
   }, [currentQuestion]);
 
   useEffect(() => {
     if (username && score > 0) {
       if (resultID) {
+        setLogs(`sending ${score} to ${resultID}`);
         axios.put(`/results/${resultID}`, {
           username,
           score,
@@ -121,18 +152,18 @@ const Quiz = () => {
   }, [isAlreadyFinished, username, score]);
 
   // Login activity
-  const handleInput = event => {
-    setUsername(event.target.value);
-  };
+  // const handleInput = event => {
+  //   setUsername(event.target.value);
+  // };
 
-  const handleLogin = event => {
-    event.preventDefault();
-    if (username.length > 0) {
-      setLogged(true);
-      cookies.set('username', username.trim());
-      cookies.set('userLogged', true);
-    }
-  };
+  // const handleLogin = event => {
+  //   event.preventDefault();
+  //   if (username.length > 0) {
+  //     setLogged(true);
+  //     cookies.set('username', username.trim());
+  //     cookies.set('userLogged', true);
+  //   }
+  // };
 
   // Quiz activity
   const handleFinishQuiz = () => {
@@ -173,6 +204,9 @@ const Quiz = () => {
         <FontAwesomeIcon icon={faBible} size='lg' />
         <p>Біблійна сотня</p>
       </div>
+      <div className='console'>
+        <p id='logger'>{logs}</p>
+      </div>
       {logged ? (
         <>
           {isAlreadyFinished ? (
@@ -197,44 +231,50 @@ const Quiz = () => {
             </>
           ) : (
             <>
-              <div className='progress-bar'>
-                <div className="loader"></div>
-              </div>
+              {loader && (
+                <div className='progress-bar'>
+                  <div className={loader}></div>
+                </div>
+              )}
               <h1>Привіт, {username}!</h1>
-              <section className='questions'>
-                {isQuestionsLoaded ? (
-                  questions.length > 0 ? (
-                    <>
-                      <p className='count'>
-                        <span>{currentQuestion + 1}</span>/{questions.length}
-                      </p>
-                      <p className='question'>
-                        {questions[currentQuestion].question}
-                      </p>
-                      <div className='answers'>
-                        {shuffleArray(questions[currentQuestion].answers).map(
-                          answer => (
-                            <button
-                              key={Math.random().toString(36).substring(2)}
-                              onClick={() => handleAnswer(answer.isAnswer)}
-                            >
-                              {answer.text}
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </>
+              <div className='qw'>
+                <section className='questions'>
+                  {isQuestionsLoaded ? (
+                    questions.length > 0 ? (
+                      <>
+                        <p className='count'>
+                          <span>{currentQuestion + 1}</span>/{questions.length}
+                        </p>
+                        <p className='question'>
+                          {questions[currentQuestion].question}
+                        </p>
+                        {
+                          <div className='answers'>
+                            {shuffleArray(
+                              questions[currentQuestion].answers
+                            ).map(answer => (
+                              <button
+                                key={Math.random().toString(36).substring(2)}
+                                onClick={() => handleAnswer(answer.isAnswer)}
+                              >
+                                {answer.text}
+                              </button>
+                            ))}
+                          </div>
+                        }
+                      </>
+                    ) : (
+                      <>
+                        <h1>Доволі пусто, хммм</h1>
+                      </>
+                    )
                   ) : (
                     <>
-                      <h1>Доволі пусто, хммм</h1>
+                      <p>Завантаження...</p>
                     </>
-                  )
-                ) : (
-                  <>
-                    <p>Завантаження...</p>
-                  </>
-                )}
-              </section>
+                  )}
+                </section>
+              </div>
             </>
           )}
         </>
@@ -242,14 +282,15 @@ const Quiz = () => {
         <>
           <div className='center-vert'>
             <h1>Вітаємо!</h1>
-            <form onSubmit={handleLogin}>
+            {/* <form onSubmit={handleLogin}>
               <input
                 type='text'
-                placeholder='Твоє ймення'
-                onInput={handleInput}
+                // placeholder='Твоє ймення'
+                // onChange={handleInput}
               />
+              <input type="text"/>
               <input type='submit' value='Поїхали!' />
-            </form>
+            </form> */}
           </div>
         </>
       )}
